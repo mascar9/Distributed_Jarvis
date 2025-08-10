@@ -1,0 +1,46 @@
+
+x-common-variables: &common-variables
+  PYTHONUNBUFFERED: 1
+  LOG_LEVEL: INFO
+
+x-common-healthcheck: &common-healthcheck
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
+
+x-common-resources: &common-resources
+  limits:
+    cpus: '2.0'
+    memory: 512M
+  reservations:
+    cpus: '0.25'
+    memory: 256M
+
+services:
+  core-service:
+    build:
+      context: ./core
+      dockerfile: Dockerfile
+    container_name: jarvis_core
+    ports:
+      - "50051:50051"
+    environment:
+      <<: *common-variables
+      GRPC_PORT: 50051
+      SERVICE_NAME: core-service
+    volumes:
+      - ./core/logs:/app/logs
+    restart: no #unless-stopped
+    networks:
+      - jarvis-network
+    healthcheck:
+      <<: *common-healthcheck
+      test: ["CMD", "python", "-c", "import grpc; channel = grpc.insecure_channel('localhost:50051'); channel.close()"]
+    deploy:
+      resources:
+        <<: *common-resources
+
+networks:
+  jarvis-network:
+    driver: bridge

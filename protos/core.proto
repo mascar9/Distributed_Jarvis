@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package core;
+
+service CoreService {
+
+  // Process a message and returns result
+  rpc ProcessMessage(MessageRequest) returns (MessageResponse);
+
+  // Health check for the service
+  rpc HealthCheck(HealthRequest) returns (HealthResponse);
+}
+
+message MessageRequest {
+  string message = 1;
+  string source = 2;
+  int64 timestamp = 3;
+}
+
+message MessageResponse {
+  string response = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+message HealthRequest {
+  string service = 1;
+}
+
+message HealthResponse {
+  string status = 1;
+  string message = 2;
+}

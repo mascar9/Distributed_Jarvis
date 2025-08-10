@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package voice;
+
+// Simple Voice service
+service VoiceService {
+  // Speaks the provided text using TTS
+  rpc Speak(SpeakRequest) returns (SpeakResponse);
+
+  // Stream of wake word detection events
+  rpc WakeWordStream(WakeWordStreamRequest) returns (stream WakeWordEvent);
+}
+
+// Request message for speaking text
+message SpeakRequest {
+  string text = 1;
+}
+
+// Response message for speak operation
+message SpeakResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Request to start wake word stream (empty for now)
+message WakeWordStreamRequest {
+}
+
+// Wake word detection event
+message WakeWordEvent {
+  bool detected = 1;
+  string wake_word = 2;
+}

@@ -4,10 +4,8 @@ package core;
 
 service CoreService {
 
-  // Process a message and returns result
   rpc ProcessMessage(MessageRequest) returns (MessageResponse);
 
-  // Health check for the service
   rpc HealthCheck(HealthRequest) returns (HealthResponse);
 }
 

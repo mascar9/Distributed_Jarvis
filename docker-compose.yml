@@ -22,7 +22,7 @@ services:
     build:
       context: ./core
       dockerfile: Dockerfile
-    container_name: jarvis_core
+    container_name: core
     ports:
       - "50051:50051"
     environment:
@@ -31,7 +31,7 @@ services:
       SERVICE_NAME: core-service
     volumes:
       - ./core/logs:/app/logs
-    restart: no #unless-stopped
+    restart: unless-stopped
     networks:
       - jarvis-network
     healthcheck:
@@ -40,7 +40,28 @@ services:
     deploy:
       resources:
         <<: *common-resources
-
+  spotify-service:
+    build:
+      context: ./spotify
+      dockerfile: Dockerfile
+    container_name: spotify
+    ports:
+      - "50052:50052"
+    environment:
+      <<: *common-variables
+      GRPC_PORT: 50052
+      SERVICE_NAME: spotify-service
+    volumes:
+      - ./core/logs:/app/logs
+    restart: no #unless-stopped
+    networks:
+      - jarvis-network
+    healthcheck:
+      <<: *common-healthcheck
+      test: [ "CMD", "python", "-c", "import grpc; channel = grpc.insecure_channel('localhost:50051'); channel.close()" ]
+    deploy:
+      resources:
+        <<: *common-resources
 networks:
   jarvis-network:
     driver: bridge

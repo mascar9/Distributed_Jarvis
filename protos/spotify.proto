@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package spotify;
+
+service SpotifyService {
+  rpc PlaySong(SongRequest) returns (SpotifyResponse);
+  rpc PlayPlaylist(PlaylistRequest) returns (SpotifyResponse);
+  rpc Stop(Empty) returns (SpotifyResponse);
+  rpc Next(Empty) returns (SpotifyResponse);
+  rpc Unpause(Empty) returns (SpotifyResponse);
+  rpc ToggleShuffle(Empty) returns (SpotifyResponse);
+  rpc SetVolume(VolumeRequest) returns (SpotifyResponse);
+
+
+  rpc HealthCheck(HealthRequest) returns (HealthResponse);
+
+}
+
+message SongRequest { string name = 1; }
+message PlaylistRequest { string name = 1; }
+message VolumeRequest { int32 level = 1; }
+message Empty {}
+
+message SpotifyResponse {
+  string response = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+message HealthRequest {
+  string service = 1;
+}
+
+message HealthResponse {
+  string status = 1;
+  string message = 2;
+}

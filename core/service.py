@@ -1,3 +1,4 @@
+import asyncio
 import os
 import grpc
 import time
@@ -8,6 +9,7 @@ from pathlib import Path
 # Import generated protobuf files
 import generated.core_pb2 as core_pb2
 import generated.core_pb2_grpc as core_pb2_grpc
+from registry import registry
 
 
 class CoreService(core_pb2_grpc.CoreServiceServicer):
@@ -16,16 +18,28 @@ class CoreService(core_pb2_grpc.CoreServiceServicer):
         self.logger.info("Core service initialized")
 
     def ProcessMessage(self, request, context):
-        """
-        Main message processing endpoint
-        Receives messages from voice.py, telegram, etc.
-        """
-        try:
-            # Log the incoming request
-            self.logger.info(f"Received message from {request.source}: '{request.message}'")
 
-            # Extract intent and generate response
-            intent, response_message = self.extract_intent(request.message)
+        try:
+
+            raw_response = self.find_run_intent(request.message)
+
+            if hasattr(raw_response, 'response'):
+                response_message = raw_response.response
+                self.logger.info(f"Extracted response field: '{response_message}'")
+            elif isinstance(raw_response, str):
+
+                if raw_response.startswith('response: '):
+
+                    import re
+                    match = re.search(r'response: "(.*?)"', raw_response)
+                    if match:
+                        response_message = match.group(1)
+                    else:
+                        response_message = raw_response
+                else:
+                    response_message = raw_response
+            else:
+                response_message = str(raw_response)
 
             # Create response
             response = core_pb2.MessageResponse(
@@ -47,39 +61,27 @@ class CoreService(core_pb2_grpc.CoreServiceServicer):
                 error_message=str(e)
             )
 
-    def extract_intent(self, message):
-        """
-        Simple intent extraction logic
-        This is where the magic happens - analyzing the message and determining intent
-        """
-        # Convert to lowercase for easier matching
-        message_lower = message.lower().strip()
+    def find_run_intent(self, command_string: str) -> str:
 
-        # Split message into words
-        words = message_lower.split()
+        words = command_string.lower().split()
 
-        # Simple intent detection
-        if any(word in words for word in ["hello", "hi", "hey", "greetings"]):
-            return "greeting", "Hello! How can I help you?"
+        result = registry.find_command(words)
 
-        elif any(word in words for word in ["bye", "goodbye", "see", "later"]):
-            return "farewell", "Goodbye! Have a great day!"
+        print(f"Found command: {words}")
 
-        elif any(word in words for word in ["how", "are", "you"]):
-            return "status_inquiry", "I'm doing great, thank you for asking!"
+        if result:
+            command, args = result
 
-        elif any(word in words for word in ["time", "what", "clock"]):
-            current_time = time.strftime("%H:%M:%S")
-            return "time_request", f"The current time is {current_time}"
+            output = command.handler(args)
 
-        elif any(word in words for word in ["help", "assist", "support"]):
-            return "help_request", "I'm here to help! You can ask me about time, say hello, or just chat."
+            print("Intent:", " ".join(map(str, command.keywords)))
+            print("Params:", args)
+            print("Output:", output)
 
-        elif any(word in words for word in ["weather", "temperature", "forecast"]):
-            return "weather_request", "I don't have weather data yet, but I'd love to help with that in the future!"
-
+            return output
         else:
-            return "unknown", "I don't know what that is"
+            print("No matching command found")
+            return "No matching command found"
 
     def HealthCheck(self, request, context):
         try:
@@ -92,7 +94,6 @@ class CoreService(core_pb2_grpc.CoreServiceServicer):
                 status="unhealthy",
                 message=f"Error: {str(e)}"
             )
-
 
 def serve():
 

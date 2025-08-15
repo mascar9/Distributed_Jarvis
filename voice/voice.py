@@ -12,14 +12,11 @@ import grpc
 import time
 import sys
 
-
 load_dotenv()
-
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-# Now you can import from core
 from core.generated import core_pb2
 from core.generated import core_pb2_grpc
 
@@ -201,6 +198,7 @@ class VoiceService:
 if __name__ == '__main__':
     voice_service = VoiceService()
     try:
-        voice_service.listen_for_wake_word()
+        #voice_service.listen_for_wake_word()
+        voice_service.send_message("play music")
     finally:
         voice_service.shutdown()

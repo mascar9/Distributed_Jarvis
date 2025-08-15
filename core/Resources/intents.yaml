@@ -1,0 +1,63 @@
+# intents.yaml
+
+set_light_color:
+  description: "Change light color"
+  keywords:
+    intent: ["light", "lights", "lamp"]
+    params:
+      color: ["red", "blue", "green", "yellow", "purple", "pink", "white"]
+  services:
+    - name: smart_home
+      action: set_light_color
+
+turn_light_on:
+  description: "Turn light on"
+  keywords:
+    intent: ["light", "lights", "lamp"]
+    action: ["on", "start"]
+
+turn_light_off:
+  description: "Turn light off"
+  keywords:
+    intent: ["light", "lights", "lamp"]
+    action: ["off", "stop", "pause"]
+
+play_song:
+  description: "Play a song"
+  keywords:
+    intent: ["play", "song", "music"]
+  params:
+    name: "*"
+
+play_playlist:
+  description: "Play a playlist"
+  keywords:
+    intent: ["playlist", "playlists"]
+  params:
+    name: "*"
+
+stop_music:
+  description: "Stop/pause music"
+  keywords:
+    intent: ["stop", "pause"]
+    object: ["music", "song"]
+
+weather:
+  description: "Get weather"
+  keywords:
+    intent: ["weather", "forecast"]
+
+good_morning:
+  description: "Morning routine"
+  keywords:
+    intent: ["good", "morning", "mornings"]
+
+good_night:
+  description: "Night routine"
+  keywords:
+    intent: ["good", "night", "nights"]
+
+news:
+  description: "Get news"
+  keywords:
+    intent: ["news", "headlines"]

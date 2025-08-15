@@ -1,11 +1,5 @@
-pyyaml
-pvrecorder
-pvporcupine
-pvcheetah
 python-dotenv
-elevenlabs~=1.50.6
 grpcio>=1.60.0
 grpcio-tools>=1.60.0
 protobuf>=5.26.0
 googleapis-common-protos>=1.62.0
-openwakeword

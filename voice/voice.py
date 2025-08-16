@@ -196,9 +196,14 @@ class VoiceService:
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: python voice.py <message>")
+        sys.exit(1)
+
+    message = " ".join(sys.argv[1:])
+
     voice_service = VoiceService()
     try:
-        #voice_service.listen_for_wake_word()
-        voice_service.send_message("play music")
+        voice_service.send_message(message)
     finally:
         voice_service.shutdown()

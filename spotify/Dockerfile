@@ -19,19 +19,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
-# Create logs directory and set permissions BEFORE creating non-root user
-RUN mkdir -p /app/logs
+# Create a non-root user FIRST
+RUN useradd --create-home --shell /bin/bash --uid 1000 app
 
-# Create a non-root user for security
-RUN useradd --create-home --shell /bin/bash app && \
+# Create directories and set ownership
+RUN mkdir -p /app/logs /app/data && \
     chown -R app:app /app
 
+# Switch to app user (this should be a separate instruction)
 USER app
 
 # Expose the gRPC port
 EXPOSE 50052
 
-# Health check (optional but recommended)
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD python -c "import grpc; channel = grpc.insecure_channel('localhost:50052'); channel.close()" || exit 1
 

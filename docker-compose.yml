@@ -52,7 +52,7 @@ services:
       GRPC_PORT: 50052
       SERVICE_NAME: spotify-service
     volumes:
-      - ./core/logs:/app/logs
+      - ./spotify/data:/app/data:Z
     restart: no #unless-stopped
     networks:
       - jarvis-network
@@ -65,3 +65,5 @@ services:
 networks:
   jarvis-network:
     driver: bridge
+volumes:
+  spotify_data:

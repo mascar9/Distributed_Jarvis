@@ -99,11 +99,41 @@ def set_mood_handler(args):
 registry.register([["hello", "hi"]], "Hello world!")(set_mood_handler)
 
 
-registry.register(["play", "music"], "Play a song", extract_args=True)(
+registry.register(["play", "music"], "Play a song on spotify", extract_args=True)(
     lambda args: spotify.PlaySong(spotify_pb2.SongRequest(name=" ".join(args)))
 )
 
+registry.register(["play", "playlist"], "Play a playlist on spotify", extract_args=True)(
+    lambda args: spotify.PlayPlaylist(spotify_pb2.PlaylistRequest(name=" ".join(args)))
+)
 
+registry.register([["stop", "pause"], ["music", "song"]], "Stop playback on spotify", extract_args=True)(
+    lambda args: spotify.Stop(spotify_pb2.Empty())
+)
+
+registry.register([["next", "skip"], ["music", "song"]], "Skip playback on spotify", extract_args=True)(
+    lambda args: spotify.Next(spotify_pb2.Empty())
+)
+
+registry.register([["continue", "unpause", "resume"], ["music", "song"]], "Resume playback on spotify", extract_args=True)(
+    lambda args: spotify.Unpause(spotify_pb2.Empty())
+)
+registry.register([["shuffle", "change"], ["music", "song"]], "Toggle shuffle on spotify", extract_args=True)(
+    lambda args: spotify.ToggleShuffle(spotify_pb2.Empty())
+)
+
+
+registry.register([["volume", "sound"], ["high", "max"]], "Set maximum volume on spotify", extract_args=True)(
+    lambda args: spotify.SetVolume(spotify_pb2.VolumeRequest(level=90))
+)
+
+registry.register([["volume", "sound"], ["medium", "normal"]], "Set normal volume on spotify", extract_args=True)(
+    lambda args: spotify.SetVolume(spotify_pb2.VolumeRequest(level=60))
+)
+
+registry.register([["volume", "sound"], "low"], "Set low volume on spotify", extract_args=True)(
+    lambda args: spotify.SetVolume(spotify_pb2.VolumeRequest(level=30))
+)
 """
 # === Binance ===
 registry.register([["portfolio", "crypto", "bitcoin", "balance"]], "Binance Portfolio")(
